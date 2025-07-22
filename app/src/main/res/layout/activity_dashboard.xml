@@ -39,30 +39,40 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="To Do"
-            android:textSize="@dimen/_24sdp"
-            android:layout_marginTop="@dimen/_10sdp"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/todoRecyclerView"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Done"
-            android:textSize="@dimen/_24sdp"
-            android:layout_marginTop="@dimen/_10sdp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:text="To Do"
+                    android:textSize="@dimen/_24sdp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/doneRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/todoRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:text="Done"
+                    android:textSize="@dimen/_24sdp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/doneRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </ScrollView>
 
 
     </LinearLayout>
