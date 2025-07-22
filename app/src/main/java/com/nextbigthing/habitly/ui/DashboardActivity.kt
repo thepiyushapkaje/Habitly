@@ -11,6 +11,11 @@ import com.nextbigthing.habitly.adapter.DoneAdapter
 import com.nextbigthing.habitly.R
 import com.nextbigthing.habitly.adapter.TodoAdapter
 import com.nextbigthing.habitly.databinding.ActivityDashboardBinding
+import com.nextbigthing.habitly.room.RoomHelper
+import com.nextbigthing.habitly.room.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -38,5 +43,13 @@ class DashboardActivity : AppCompatActivity() {
         binding.doneRecyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.doneRecyclerView.adapter = DoneAdapter()
+
+        binding.fabAddHabit.setOnClickListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                val db = RoomHelper.getDatabase(this@DashboardActivity)
+                val userDao = db.userDao()
+                userDao.insertAll(User(1, "Piyush", "Jaiswal"))
+            }
+        }
     }
 }
