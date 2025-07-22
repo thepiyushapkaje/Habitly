@@ -19,4 +19,7 @@ interface HabitDao {
 
     @Delete
     fun delete(habit: Habit)
+
+    @Query("DELETE FROM habit")
+    fun deleteAll()
 }

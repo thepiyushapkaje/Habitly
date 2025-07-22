@@ -1,7 +1,10 @@
 package com.nextbigthing.habitly.ui
 
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -35,6 +38,21 @@ class DashboardActivity : AppCompatActivity() {
             insets
         }
 
+        binding.textView2.setOnClickListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                val db = RoomHelper.getDatabase(this@DashboardActivity)
+                val userDao = db.habitDao()
+                // Insert a new habit
+                userDao.deleteAll()
+                val updatedHabits = userDao.getAll()
+
+                // Update UI on main thread
+                withContext(Dispatchers.Main) {
+                    todoAdapter.updateList(updatedHabits)
+                }
+            }
+        }
+
         binding.dateRecyclerView.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.dateRecyclerView.adapter = CalendarAdapter()
@@ -59,19 +77,36 @@ class DashboardActivity : AppCompatActivity() {
         binding.doneRecyclerView.adapter = DoneAdapter()
 
         binding.fabAddHabit.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                val db = RoomHelper.getDatabase(this@DashboardActivity)
-                val userDao = db.habitDao()
+            val dialogView = layoutInflater.inflate(R.layout.dailog_add_habit, null)  // Inflate the layout
+            val dialog = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create()
 
-                // Insert a new habit
-                userDao.insertAll(Habit(firstName = "Piyush", isCompleted = false))
+            val habitEditText = dialogView.findViewById<EditText>(R.id.habitEditText)
+            val confirmHabitButton = dialogView.findViewById<Button>(R.id.confirmHabitButton)
 
-                // Fetch updated list
-                val updatedHabits = userDao.getAll()
+            dialog.show()
 
-                // Update UI on main thread
-                withContext(Dispatchers.Main) {
-                    todoAdapter.updateList(updatedHabits)
+            confirmHabitButton.setOnClickListener {
+                if (habitEditText.text.isNotEmpty()) {
+                    dialog.dismiss()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val db = RoomHelper.getDatabase(this@DashboardActivity)
+                        val userDao = db.habitDao()
+
+                        // Insert a new habit
+                        userDao.insertAll(Habit(firstName = habitEditText.text.toString(), isCompleted = false))
+
+                        // Fetch updated list
+                        val updatedHabits = userDao.getAll()
+
+                        // Update UI on main thread
+                        withContext(Dispatchers.Main) {
+                            todoAdapter.updateList(updatedHabits)
+                        }
+                    }
+                }else{
+                    habitEditText.error = "Please enter a habit"
                 }
             }
         }

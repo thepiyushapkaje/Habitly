@@ -27,7 +27,7 @@ class TodoAdapter(private var todoList: List<Habit>) : RecyclerView.Adapter<Todo
     override fun getItemCount(): Int = todoList.size
 
     fun updateList(newHabits: List<Habit>) {
-        todoList = newHabits // `habits` should be a var in your adapter
+        todoList = newHabits
         notifyDataSetChanged()
     }
 }
