@@ -75,10 +75,12 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <CalendarView
+                <com.applandeo.materialcalendarview.CalendarView
                     android:id="@+id/calendarView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="match_parent"
+                    app:headerColor="@color/white"
+                    app:headerLabelColor="@color/black"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
