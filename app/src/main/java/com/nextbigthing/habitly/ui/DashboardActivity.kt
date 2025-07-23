@@ -4,11 +4,15 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.nextbigthing.habitly.DashboardViewModel
 import com.nextbigthing.habitly.R
 import com.nextbigthing.habitly.adapter.CalendarAdapter
 import com.nextbigthing.habitly.adapter.DoneAdapter
@@ -24,7 +28,9 @@ import kotlinx.coroutines.withContext
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
+    private val viewModel: DashboardViewModel by viewModels()
     private lateinit var todoAdapter: TodoAdapter
+    private lateinit var doneAdapter: DoneAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,46 +44,50 @@ class DashboardActivity : AppCompatActivity() {
             insets
         }
 
-        binding.textView2.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                val db = RoomHelper.getDatabase(this@DashboardActivity)
-                val userDao = db.habitDao()
-                // Insert a new habit
-                userDao.deleteAll()
-                val updatedHabits = userDao.getAll()
+        setupAdapters()
+        setupRecyclerViews()
+        handleClickEvents()
 
-                // Update UI on main thread
-                withContext(Dispatchers.Main) {
-                    todoAdapter.updateList(updatedHabits)
-                }
+        // Observe StateFlows using lifecycleScope
+        lifecycleScope.launch {
+            viewModel.pendingHabits.collect {
+                todoAdapter.updateList(it)
             }
         }
 
-        binding.dateRecyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        lifecycleScope.launch {
+            viewModel.completedHabits.collect {
+                doneAdapter.updateList(it)
+            }
+        }
+    }
+
+    private fun setupAdapters() {
+        todoAdapter = TodoAdapter(emptyList()) {
+            viewModel.updateHabitCompletion(it, true)
+        }
+        doneAdapter = DoneAdapter(emptyList()) {
+            viewModel.updateHabitCompletion(it, false)
+        }
+    }
+
+    private fun setupRecyclerViews() {
+        binding.todoRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.doneRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.dateRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        binding.todoRecyclerView.adapter = todoAdapter
+        binding.doneRecyclerView.adapter = doneAdapter
         binding.dateRecyclerView.adapter = CalendarAdapter()
+    }
 
-        binding.todoRecyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-
-        // Load habits in background and set adapter on the main thread
-        CoroutineScope(Dispatchers.IO).launch {
-            val db = RoomHelper.getDatabase(this@DashboardActivity)
-            val userDao = db.habitDao()
-            val habits = userDao.getAll()
-
-            withContext(Dispatchers.Main) {
-                todoAdapter = TodoAdapter(habits)
-                binding.todoRecyclerView.adapter = todoAdapter
-            }
+    private fun handleClickEvents() {
+        binding.textView2.setOnClickListener {
+            viewModel.deleteAll()
         }
-
-        binding.doneRecyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.doneRecyclerView.adapter = DoneAdapter()
 
         binding.fabAddHabit.setOnClickListener {
-            val dialogView = layoutInflater.inflate(R.layout.dailog_add_habit, null)  // Inflate the layout
+            val dialogView = layoutInflater.inflate(R.layout.dailog_add_habit, null)
             val dialog = AlertDialog.Builder(this)
                 .setView(dialogView)
                 .create()
@@ -88,24 +98,11 @@ class DashboardActivity : AppCompatActivity() {
             dialog.show()
 
             confirmHabitButton.setOnClickListener {
-                if (habitEditText.text.isNotEmpty()) {
+                val habitName = habitEditText.text.toString()
+                if (habitName.isNotEmpty()) {
+                    viewModel.addHabit(habitName)
                     dialog.dismiss()
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val db = RoomHelper.getDatabase(this@DashboardActivity)
-                        val userDao = db.habitDao()
-
-                        // Insert a new habit
-                        userDao.insertAll(Habit(firstName = habitEditText.text.toString(), isCompleted = false))
-
-                        // Fetch updated list
-                        val updatedHabits = userDao.getAll()
-
-                        // Update UI on main thread
-                        withContext(Dispatchers.Main) {
-                            todoAdapter.updateList(updatedHabits)
-                        }
-                    }
-                }else{
+                } else {
                     habitEditText.error = "Please enter a habit"
                 }
             }

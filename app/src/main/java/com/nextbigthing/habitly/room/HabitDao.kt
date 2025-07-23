@@ -4,22 +4,23 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface HabitDao {
 
-    @Query("SELECT * FROM habit")
-    fun getAll(): List<Habit>
+    @Query("SELECT * FROM habit WHERE status= 0")
+    suspend fun getPendingHabits(): List<Habit>
 
-    @Query("SELECT * FROM habit WHERE uid IN (:userIds)")
-    fun loadAllByIds(userIds: IntArray): List<Habit>
+    @Query("SELECT * FROM habit WHERE status= 1")
+    suspend fun getCompletedHabits(): List<Habit>
 
     @Insert
-    fun insertAll(vararg habit: Habit)
+    suspend fun insertAll(vararg habits: Habit)
 
-    @Delete
-    fun delete(habit: Habit)
+    @Update
+    suspend fun update(habit: Habit)
 
     @Query("DELETE FROM habit")
-    fun deleteAll()
+    suspend fun deleteAll()
 }
