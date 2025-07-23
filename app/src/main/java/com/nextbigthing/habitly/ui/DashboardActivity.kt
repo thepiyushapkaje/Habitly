@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.nextbigthing.habitly.AppCustom
 import com.nextbigthing.habitly.DashboardViewModel
 import com.nextbigthing.habitly.R
 import com.nextbigthing.habitly.adapter.CalendarAdapter
@@ -78,7 +79,7 @@ class DashboardActivity : AppCompatActivity() {
 
         binding.todoRecyclerView.adapter = todoAdapter
         binding.doneRecyclerView.adapter = doneAdapter
-        binding.dateRecyclerView.adapter = CalendarAdapter()
+        binding.dateRecyclerView.adapter = CalendarAdapter(AppCustom.generateCalendarDays())
     }
 
     private fun handleClickEvents() {
