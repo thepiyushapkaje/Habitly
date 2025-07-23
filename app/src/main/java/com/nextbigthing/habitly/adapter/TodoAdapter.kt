@@ -1,5 +1,6 @@
 package com.nextbigthing.habitly.adapter
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.nextbigthing.habitly.R
 import com.nextbigthing.habitly.room.Habit
+import com.nextbigthing.habitly.ui.HabitProgressActivity
 import javax.security.auth.callback.Callback
 
 class TodoAdapter(private var todoList: List<Habit>, private val callback: (Habit) -> Unit) :
@@ -25,7 +27,13 @@ class TodoAdapter(private var todoList: List<Habit>, private val callback: (Habi
     }
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
+        val context = holder.itemView.context
         holder.todoTitleTextView.text = todoList[position].firstName
+        holder.todoTitleTextView.setOnClickListener {
+            context.startActivity(Intent(context, HabitProgressActivity::class.java).apply {
+                putExtra("title", todoList[position].firstName)
+            })
+        }
         holder.imageView.setOnClickListener {
             callback(todoList[position])
         }

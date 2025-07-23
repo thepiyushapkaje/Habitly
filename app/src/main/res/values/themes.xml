@@ -10,4 +10,5 @@
     <style name="Theme.Habitly" parent="Base.Theme.Habitly">
         <item name="fontFamily">@font/outfit</item>
     </style>
+
 </resources>

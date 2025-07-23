@@ -11,7 +11,9 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Habitly">
-
+        <activity
+            android:name=".ui.HabitProgressActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.OnboardingActivity"
             android:exported="true">
