@@ -2,18 +2,25 @@ package com.nextbigthing.habitly.ui
 
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.nextbigthing.habitly.DashboardViewModel
 import com.nextbigthing.habitly.R
 import com.nextbigthing.habitly.databinding.ActivityHabitProgressBinding
+import kotlin.getValue
 
 
 class HabitProgressActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHabitProgressBinding
+    private val viewModel: DashboardViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,5 +34,27 @@ class HabitProgressActivity : AppCompatActivity() {
         }
 
         binding.todoTitleTextView.text = intent.getStringExtra("title")
+
+        binding.fabAddHabit2.setOnClickListener {
+            val dialogView = layoutInflater.inflate(R.layout.dailog_add_habit, null)
+            val dialog = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create()
+
+            val habitEditText = dialogView.findViewById<EditText>(R.id.habitEditText)
+            val confirmHabitButton = dialogView.findViewById<Button>(R.id.confirmHabitButton)
+
+            dialog.show()
+
+            confirmHabitButton.setOnClickListener {
+                val habitName = habitEditText.text.toString()
+                if (habitName.isNotEmpty()) {
+                    viewModel.addHabit(habitName)
+                    dialog.dismiss()
+                } else {
+                    habitEditText.error = "Please enter a habit"
+                }
+            }
+        }
     }
 }
