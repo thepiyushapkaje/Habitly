@@ -11,7 +11,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.nextbigthing.habitly.AppCustom
 import com.nextbigthing.habitly.DashboardViewModel
 import com.nextbigthing.habitly.R
@@ -47,6 +50,7 @@ class DashboardActivity : AppCompatActivity() {
 
         setupAdapters()
         setupRecyclerViews()
+        setupSwipeToDelete()
         handleClickEvents()
 
         // Observe StateFlows using lifecycleScope
@@ -75,7 +79,8 @@ class DashboardActivity : AppCompatActivity() {
     private fun setupRecyclerViews() {
         binding.todoRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.doneRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.dateRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.dateRecyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         binding.todoRecyclerView.adapter = todoAdapter
         binding.doneRecyclerView.adapter = doneAdapter
@@ -108,5 +113,39 @@ class DashboardActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun setupSwipeToDelete() {
+        val itemTouchHelper = ItemTouchHelper(object :
+            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+
+                // Get the current list from adapter (you need to add this getter in adapter)
+                val currentList = todoAdapter.getCurrentList().toMutableList()
+                val deletedHabit = currentList[position]
+
+                // Remove it from the list and update adapter
+                currentList.removeAt(position)
+                todoAdapter.updateList(currentList)
+
+                // Delete from DB via ViewModel
+                viewModel.deleteHabit(deletedHabit)
+
+                // Optional Undo using Snackbar
+                Snackbar.make(binding.todoRecyclerView, "Habit deleted", Snackbar.LENGTH_LONG)
+                    .setAction("Undo") {
+                        viewModel.addHabit(deletedHabit.firstName.toString())
+                    }.show()
+            }
+        })
+
+        itemTouchHelper.attachToRecyclerView(binding.todoRecyclerView)
     }
 }

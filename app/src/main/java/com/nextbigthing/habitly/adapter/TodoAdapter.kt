@@ -45,4 +45,6 @@ class TodoAdapter(private var todoList: List<Habit>, private val callback: (Habi
         todoList = newHabits
         notifyDataSetChanged()
     }
+
+    fun getCurrentList(): List<Habit> = todoList
 }

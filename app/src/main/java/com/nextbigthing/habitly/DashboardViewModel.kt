@@ -38,6 +38,10 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         loadHabits()
     }
 
+    fun deleteHabit(habit: Habit) = viewModelScope.launch {
+        dao.delete(habit)
+    }
+
     fun deleteAll() = viewModelScope.launch {
         dao.deleteAll()
         loadHabits()
