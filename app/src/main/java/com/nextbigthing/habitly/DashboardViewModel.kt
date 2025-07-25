@@ -19,6 +19,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _completedHabits = MutableStateFlow<List<Habit>>(emptyList())
     val completedHabits: StateFlow<List<Habit>> = _completedHabits.asStateFlow()
 
+    private val _selectedHabit = MutableStateFlow<Habit?>(null)
+    val selectedHabit: StateFlow<Habit?> = _selectedHabit.asStateFlow()
+
     init {
         loadHabits()
     }
@@ -35,6 +38,16 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun updateHabitCompletion(habit: Habit, completed: Boolean) = viewModelScope.launch {
         dao.update(habit.apply { isCompleted = completed })
+        loadHabits()
+    }
+
+    fun loadHabitById(id: Int) = viewModelScope.launch {
+        _selectedHabit.value = dao.getHabitById(id)
+    }
+
+    fun updateHabitName(habit: Habit, newName: String) = viewModelScope.launch {
+        val updatedHabit = habit.copy(firstName = newName)
+        dao.update(updatedHabit)
         loadHabits()
     }
 

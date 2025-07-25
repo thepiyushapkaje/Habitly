@@ -30,7 +30,7 @@ class DoneAdapter(
 
         holder.binding.todoTitleTextView.setOnClickListener {
             context.startActivity(Intent(context, HabitProgressActivity::class.java).apply {
-                putExtra("title", habit.firstName)
+                putExtra("uniqueId", habit.uid)
             })
         }
         holder.binding.imageView.setImageResource(R.drawable.ic_unchecked)

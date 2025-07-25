@@ -15,6 +15,9 @@ interface HabitDao {
     @Query("SELECT * FROM habit WHERE status= 1")
     suspend fun getCompletedHabits(): List<Habit>
 
+    @Query("SELECT * FROM habit WHERE uid = :habitId LIMIT 1")
+    suspend fun getHabitById(habitId: Int): Habit?
+
     @Insert
     suspend fun insertAll(vararg habits: Habit)
 
