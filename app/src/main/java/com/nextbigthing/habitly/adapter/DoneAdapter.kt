@@ -2,40 +2,40 @@ package com.nextbigthing.habitly.adapter
 
 import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.nextbigthing.habitly.R
+import com.nextbigthing.habitly.databinding.ItemViewTodoBinding
 import com.nextbigthing.habitly.room.Habit
 import com.nextbigthing.habitly.ui.HabitProgressActivity
 
-class DoneAdapter(private var todoList: List<Habit>, private val callback: (Habit) -> Unit) : RecyclerView.Adapter<DoneAdapter.CalendarViewHolder>() {
+class DoneAdapter(
+    private var todoList: List<Habit>,
+    private val callback: (Habit) -> Unit
+) : RecyclerView.Adapter<DoneAdapter.CalendarViewHolder>() {
 
-
-    inner class CalendarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val todoTitleTextView: TextView = itemView.findViewById(R.id.todoTitleTextView)
-        val imageView: ImageView = itemView.findViewById(R.id.imageView)
-    }
+    inner class CalendarViewHolder(val binding: ItemViewTodoBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_view_todo, parent, false)
-        return CalendarViewHolder(view)
+        val binding = ItemViewTodoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return CalendarViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
+        val habit = todoList[position]
         val context = holder.itemView.context
-        holder.todoTitleTextView.text = todoList[position].firstName
-        holder.todoTitleTextView.setOnClickListener {
+
+        holder.binding.todoTitleTextView.text = habit.firstName
+
+        holder.binding.todoTitleTextView.setOnClickListener {
             context.startActivity(Intent(context, HabitProgressActivity::class.java).apply {
-                putExtra("title", todoList[position].firstName)
+                putExtra("title", habit.firstName)
             })
         }
-        holder.imageView.setImageResource(R.drawable.ic_unchecked)
-        holder.imageView.setOnClickListener {
-            callback(todoList[position])
+        holder.binding.imageView.setImageResource(R.drawable.ic_unchecked)
+        holder.binding.imageView.setOnClickListener {
+            callback(habit)
         }
     }
 
@@ -45,4 +45,6 @@ class DoneAdapter(private var todoList: List<Habit>, private val callback: (Habi
         todoList = newHabits
         notifyDataSetChanged()
     }
+
+    fun getCurrentList(): List<Habit> = todoList
 }
