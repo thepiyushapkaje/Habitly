@@ -48,6 +48,11 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     fun updateHabitName(habit: Habit, newName: String) = viewModelScope.launch {
         val updatedHabit = habit.copy(firstName = newName)
         dao.update(updatedHabit)
+
+        // Force reload the updated habit from DB so StateFlow emits
+        _selectedHabit.value = dao.getHabitById(updatedHabit.uid)
+
+        // Optional: also update full habit lists
         loadHabits()
     }
 

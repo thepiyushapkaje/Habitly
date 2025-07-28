@@ -9,8 +9,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -55,16 +57,25 @@ class DashboardActivity : AppCompatActivity() {
 
         // Observe StateFlows using lifecycleScope
         lifecycleScope.launch {
-            viewModel.pendingHabits.collect {
-                todoAdapter.updateList(it)
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.pendingHabits.collect {
+                    todoAdapter.updateList(it)
+                }
             }
         }
 
         lifecycleScope.launch {
-            viewModel.completedHabits.collect {
-                doneAdapter.updateList(it)
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.completedHabits.collect {
+                    doneAdapter.updateList(it)
+                }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadHabits()
     }
 
     private fun setupAdapters() {
