@@ -29,4 +29,7 @@ interface HabitDao {
 
     @Query("DELETE FROM habit")
     suspend fun deleteAll()
+
+    @Insert
+    suspend fun saveDate(saveDate: SaveDate)
 }

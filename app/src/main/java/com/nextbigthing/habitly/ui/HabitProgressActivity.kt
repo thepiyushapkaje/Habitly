@@ -1,7 +1,9 @@
 package com.nextbigthing.habitly.ui
 
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -20,7 +22,9 @@ import com.nextbigthing.habitly.DashboardViewModel
 import com.nextbigthing.habitly.R
 import com.nextbigthing.habitly.databinding.ActivityHabitProgressBinding
 import com.nextbigthing.habitly.room.Habit
+import com.nextbigthing.habitly.room.SaveDate
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import kotlin.getValue
 
 
@@ -58,6 +62,16 @@ class HabitProgressActivity : AppCompatActivity() {
         viewModel.loadHabitById(uniqueId)
 
         var currentHabit: Habit? = null
+
+        binding.cardView.setOnClickListener {
+            val date = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LocalDate.now().toString()
+            } else {
+                ""
+            }
+            Log.d("TAGGER", "onCreate: $date")
+            viewModel.insertDate(date)
+        }
 
         // Observe selected habit
         lifecycleScope.launch {

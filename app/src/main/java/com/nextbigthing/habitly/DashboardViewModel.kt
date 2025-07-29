@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextbigthing.habitly.room.Habit
 import com.nextbigthing.habitly.room.RoomHelper
+import com.nextbigthing.habitly.room.SaveDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,5 +64,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     fun deleteAll() = viewModelScope.launch {
         dao.deleteAll()
         loadHabits()
+    }
+
+    fun insertDate(date: String) = viewModelScope.launch {
+        dao.saveDate(SaveDate(0, date))
     }
 }
