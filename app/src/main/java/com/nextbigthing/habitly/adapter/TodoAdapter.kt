@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.nextbigthing.habitly.R
 import com.nextbigthing.habitly.databinding.ItemViewTodoBinding
-import com.nextbigthing.habitly.room.Habit
+import com.nextbigthing.habitly.room.data.Habit
 import com.nextbigthing.habitly.ui.HabitProgressActivity
 
 class TodoAdapter(

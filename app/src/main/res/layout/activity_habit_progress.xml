@@ -63,6 +63,12 @@
 
         </androidx.cardview.widget.CardView>
 
+        <TextView
+            android:id="@+id/statusListTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="statusListTextView" />
+
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="@dimen/_320sdp"

@@ -1,15 +1,20 @@
-package com.nextbigthing.habitly
+package com.nextbigthing.habitly.ui.viewmodel
 
 import android.app.Application
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.nextbigthing.habitly.room.Habit
+import com.nextbigthing.habitly.room.data.Habit
 import com.nextbigthing.habitly.room.RoomHelper
-import com.nextbigthing.habitly.room.SaveDate
+import com.nextbigthing.habitly.room.data.HabitStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Date
+import java.util.Locale
 
 class DashboardViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = RoomHelper.getDatabase(application).habitDao()
@@ -22,6 +27,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _selectedHabit = MutableStateFlow<Habit?>(null)
     val selectedHabit: StateFlow<Habit?> = _selectedHabit.asStateFlow()
+
+    private val _habitStatuses = MutableStateFlow<List<HabitStatus>>(emptyList())
+    val habitStatuses: StateFlow<List<HabitStatus>> = _habitStatuses
 
     init {
         loadHabits()
@@ -38,7 +46,19 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun updateHabitCompletion(habit: Habit, completed: Boolean) = viewModelScope.launch {
+        val date = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LocalDate.now().toString()
+        } else {
+            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        }
+
+        // 1. Update main habit status
         dao.update(habit.apply { isCompleted = completed })
+
+        // 2. Save to HabitStatus table
+        dao.insertHabitStatus(HabitStatus(habitId = habit.uid, date = date, isCompleted = completed))
+
+        // 3. Refresh UI
         loadHabits()
     }
 
@@ -66,7 +86,12 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         loadHabits()
     }
 
-    fun insertDate(date: String) = viewModelScope.launch {
-        dao.saveDate(SaveDate(0, date))
+    fun insertHabitStatus(habitId: Int, date: String, completed: Boolean) = viewModelScope.launch {
+        val status = HabitStatus(habitId = habitId, date = date, isCompleted = completed)
+        dao.insertHabitStatus(status)
+    }
+
+    fun loadStatusesForHabit(habitId: Int) = viewModelScope.launch {
+        _habitStatuses.value = dao.getStatusesForHabit(habitId)
     }
 }

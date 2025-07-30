@@ -1,4 +1,4 @@
-package com.nextbigthing.habitly
+package com.nextbigthing.habitly.room.data
 
 data class CalendarDay(
     val dayOfWeek: String,

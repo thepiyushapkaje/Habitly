@@ -5,6 +5,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.nextbigthing.habitly.room.data.Habit
+import com.nextbigthing.habitly.room.data.HabitStatus
 
 @Dao
 interface HabitDao {
@@ -31,5 +33,8 @@ interface HabitDao {
     suspend fun deleteAll()
 
     @Insert
-    suspend fun saveDate(saveDate: SaveDate)
+    suspend fun insertHabitStatus(status: HabitStatus)
+
+    @Query("SELECT * FROM HabitStatus WHERE habitId = :habitId ORDER BY date DESC")
+    suspend fun getStatusesForHabit(habitId: Int): List<HabitStatus>
 }

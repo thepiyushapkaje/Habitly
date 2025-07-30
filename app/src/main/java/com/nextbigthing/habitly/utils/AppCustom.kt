@@ -1,5 +1,6 @@
-package com.nextbigthing.habitly
+package com.nextbigthing.habitly.utils
 
+import com.nextbigthing.habitly.room.data.CalendarDay
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale

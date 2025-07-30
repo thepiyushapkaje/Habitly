@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.nextbigthing.habitly.CalendarDay
+import com.nextbigthing.habitly.room.data.CalendarDay
 import com.nextbigthing.habitly.R
 
 class CalendarAdapter(val days: List<CalendarDay>) : RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {

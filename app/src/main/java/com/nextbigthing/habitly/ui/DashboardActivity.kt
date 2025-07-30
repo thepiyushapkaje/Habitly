@@ -10,26 +10,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.nextbigthing.habitly.AppCustom
-import com.nextbigthing.habitly.DashboardViewModel
+import com.nextbigthing.habitly.utils.AppCustom
+import com.nextbigthing.habitly.ui.viewmodel.DashboardViewModel
 import com.nextbigthing.habitly.R
 import com.nextbigthing.habitly.adapter.CalendarAdapter
 import com.nextbigthing.habitly.adapter.DoneAdapter
 import com.nextbigthing.habitly.adapter.TodoAdapter
 import com.nextbigthing.habitly.databinding.ActivityDashboardBinding
-import com.nextbigthing.habitly.room.Habit
-import com.nextbigthing.habitly.room.RoomHelper
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class DashboardActivity : AppCompatActivity() {
 

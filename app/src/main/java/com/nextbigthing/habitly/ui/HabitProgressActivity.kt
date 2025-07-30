@@ -1,6 +1,5 @@
 package com.nextbigthing.habitly.ui
 
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -12,17 +11,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.nextbigthing.habitly.DashboardViewModel
+import com.nextbigthing.habitly.ui.viewmodel.DashboardViewModel
 import com.nextbigthing.habitly.R
 import com.nextbigthing.habitly.databinding.ActivityHabitProgressBinding
-import com.nextbigthing.habitly.room.Habit
-import com.nextbigthing.habitly.room.SaveDate
+import com.nextbigthing.habitly.room.data.Habit
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import kotlin.getValue
@@ -63,16 +60,6 @@ class HabitProgressActivity : AppCompatActivity() {
 
         var currentHabit: Habit? = null
 
-        binding.cardView.setOnClickListener {
-            val date = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LocalDate.now().toString()
-            } else {
-                ""
-            }
-            Log.d("TAGGER", "onCreate: $date")
-            viewModel.insertDate(date)
-        }
-
         // Observe selected habit
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -83,6 +70,28 @@ class HabitProgressActivity : AppCompatActivity() {
                         confirmHabitButton.text = "Update Habit"
                         habitEditText.setText(it.firstName)
                         binding.todoTitleTextView.text = it.firstName
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.habitStatuses.collect { statuses ->
+                    val text = statuses.joinToString("\n") {
+                        val status = if (it.isCompleted) "Done" else "Not Done"
+                        "${it.date}: $status"
+                    }
+                    binding.statusListTextView.text = text
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedHabit.collect { habit ->
+                    habit?.let {
+                        viewModel.loadStatusesForHabit(it.uid)
                     }
                 }
             }
