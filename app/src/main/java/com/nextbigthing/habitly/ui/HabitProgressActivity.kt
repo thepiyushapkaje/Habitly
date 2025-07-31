@@ -82,7 +82,7 @@ class HabitProgressActivity : AppCompatActivity() {
                         val status = if (it.isCompleted) "Done" else "Not Done"
                         "${it.date}: $status"
                     }
-                    binding.statusListTextView.text = text
+//                    binding.statusListTextView.text = text
                 }
             }
         }
@@ -119,6 +119,27 @@ class HabitProgressActivity : AppCompatActivity() {
         // Show dialog
         binding.fabAddHabit2.setOnClickListener {
             dialog.show()
+        }
+
+        // Load completed dates
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.completedDates.collect { dates ->
+                    val dateText = dates.joinToString("\n") { "✔️ $it" }
+                    binding.statusListTextView.text = dateText
+                }
+            }
+        }
+
+        // When habit is loaded, also load its completed dates
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedHabit.collect { habit ->
+                    habit?.let {
+                        viewModel.loadCompletedDates(it.uid)
+                    }
+                }
+            }
         }
     }
 }

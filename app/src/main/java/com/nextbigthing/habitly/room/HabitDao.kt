@@ -37,4 +37,7 @@ interface HabitDao {
 
     @Query("SELECT * FROM HabitStatus WHERE habitId = :habitId ORDER BY date DESC")
     suspend fun getStatusesForHabit(habitId: Int): List<HabitStatus>
+
+    @Query("SELECT date FROM HabitStatus WHERE habitId = :habitId AND isCompleted = 1 ORDER BY date ASC")
+    suspend fun getCompletedDatesForHabit(habitId: Int): List<String>
 }

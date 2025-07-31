@@ -31,6 +31,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _habitStatuses = MutableStateFlow<List<HabitStatus>>(emptyList())
     val habitStatuses: StateFlow<List<HabitStatus>> = _habitStatuses
 
+    private val _completedDates = MutableStateFlow<List<String>>(emptyList())
+    val completedDates: StateFlow<List<String>> = _completedDates
+
     init {
         loadHabits()
     }
@@ -93,5 +96,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun loadStatusesForHabit(habitId: Int) = viewModelScope.launch {
         _habitStatuses.value = dao.getStatusesForHabit(habitId)
+    }
+
+    fun loadCompletedDates(habitId: Int) = viewModelScope.launch {
+        _completedDates.value = dao.getCompletedDatesForHabit(habitId)
     }
 }
