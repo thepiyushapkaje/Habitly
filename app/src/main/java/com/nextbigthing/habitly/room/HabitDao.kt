@@ -3,8 +3,10 @@ package com.nextbigthing.habitly.room
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.nextbigthing.habitly.room.data.AppMeta
 import com.nextbigthing.habitly.room.data.Habit
 import com.nextbigthing.habitly.room.data.HabitStatus
 
@@ -38,6 +40,25 @@ interface HabitDao {
     @Query("SELECT * FROM HabitStatus WHERE habitId = :habitId ORDER BY date DESC")
     suspend fun getStatusesForHabit(habitId: Int): List<HabitStatus>
 
-    @Query("SELECT date FROM HabitStatus WHERE habitId = :habitId AND isCompleted = 1 ORDER BY date ASC")
+    @Query("""
+    SELECT date FROM HabitStatus
+    WHERE habitId = :habitId
+      AND isCompleted = 1
+      AND id IN (
+          SELECT MAX(id) FROM HabitStatus
+          WHERE habitId = :habitId
+          GROUP BY date
+      )
+    ORDER BY date ASC
+    """)
     suspend fun getCompletedDatesForHabit(habitId: Int): List<String>
+
+    @Query("UPDATE Habit SET status = 0")
+    suspend fun resetAllHabitStatus()
+
+    @Query("SELECT * FROM AppMeta WHERE id = 1")
+    suspend fun getAppMeta(): AppMeta?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAppMeta(meta: AppMeta)
 }

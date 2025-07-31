@@ -69,6 +69,7 @@ class DashboardActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.resetHabitsIfNewDay()
         viewModel.loadHabits()
     }
 

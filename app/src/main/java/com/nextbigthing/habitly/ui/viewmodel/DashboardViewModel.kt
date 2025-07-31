@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextbigthing.habitly.room.data.Habit
 import com.nextbigthing.habitly.room.RoomHelper
+import com.nextbigthing.habitly.room.data.AppMeta
 import com.nextbigthing.habitly.room.data.HabitStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -59,7 +60,13 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         dao.update(habit.apply { isCompleted = completed })
 
         // 2. Save to HabitStatus table
-        dao.insertHabitStatus(HabitStatus(habitId = habit.uid, date = date, isCompleted = completed))
+        dao.insertHabitStatus(
+            HabitStatus(
+                habitId = habit.uid,
+                date = date,
+                isCompleted = completed
+            )
+        )
 
         // 3. Refresh UI
         loadHabits()
@@ -100,5 +107,20 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun loadCompletedDates(habitId: Int) = viewModelScope.launch {
         _completedDates.value = dao.getCompletedDatesForHabit(habitId)
+    }
+
+    fun resetHabitsIfNewDay() = viewModelScope.launch {
+        val today = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LocalDate.now().toString()
+        } else {
+            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        }
+
+        val meta = dao.getAppMeta()
+        if (meta?.lastResetDate != today) {
+            dao.resetAllHabitStatus()
+            dao.insertAppMeta(AppMeta(id = 1, lastResetDate = today))
+            loadHabits()
+        }
     }
 }

@@ -9,7 +9,9 @@ object RoomHelper {
         val db = Room.databaseBuilder(
             context.applicationContext,
             AppDatabase::class.java, "database-name"
-        ).build()
+        )
+            .addMigrations(MIGRATION_2_3)
+            .build()
         return db
     }
 
